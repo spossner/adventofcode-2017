@@ -1,48 +1,48 @@
 from __future__ import annotations
-import itertools
+
 import os
-import re
 import sys
-from collections import defaultdict, deque
+from copy import deepcopy
 from functools import reduce
+
+from knot_hash import KnotHash
 
 DIRECT_ADJACENTS = {(0, -1), (-1, 0), (1, 0), (0, 1), }  # 4 adjacent nodes
 ALL_ADJACENTS = {(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1,)}
 
-
-class ListNode:
-    def __init__(self, value, next=None):
-        self.value = value
-        self.next = next
-
-    def set_next(self, next: ListNode):
-        self.next = next
+BITS = {
+    '0': '0000',
+    '1': '0001',
+    '2': '0010',
+    '3': '0011',
+    '4': '0100',
+    '5': '0101',
+    '6': '0110',
+    '7': '0111',
+    '8': '1000',
+    '9': '1001',
+    'A': '1010',
+    'B': '1011',
+    'C': '1100',
+    'D': '1101',
+    'E': '1110',
+    'F': '1111',
+}
+BITS_LIST = (
+'0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111', '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111',)
 
 
 class Solution:
     def solve(self, data, n=10, modified=False):
         numbers = list(range(n))
-        ptr = 0
-        skip_size = 0
         rounds = 1
-
         if modified:
             data = [*[ord(c) for c in data], *[17, 31, 73, 47, 23]]
             rounds = 64
         else:
             data = [int(d) for d in data]
 
-        for r in range(rounds):
-            for s in data:
-                # self.dump_numbers(numbers, ptr)
-                stripe = list(reversed([*numbers, *numbers][ptr:ptr + s]))
-                # print(f"({stripe})")
-                for i in range(s):
-                    numbers[(ptr + i) % n] = stripe[i]
-                ptr = (ptr + s + skip_size) % n
-                skip_size += 1
-            print(f"After round {r + 1}")
-            self.dump_numbers(numbers, ptr)
+        numbers = KnotHash.encrypt(numbers, data, rounds)
 
         if not modified:
             return numbers[0] * numbers[1]
@@ -52,8 +52,7 @@ class Solution:
             result.append(reduce(lambda a, b: a ^ b, numbers[i << 4:(i << 4) + 16]))
         print(''.join([f"{d:02x}" for d in result]))
 
-    def dump_numbers(self, numbers, ptr=None):
-        print(', '.join([str(d) if ptr is None or i != ptr else f"[{d}]" for i, d in enumerate(numbers)]))
+
 
 
 if __name__ == '__main__':
@@ -64,9 +63,9 @@ if __name__ == '__main__':
     s = Solution()
 
     ## PART1
-    # with open(f'{script}-dev.txt') as f:
-    #     result = s.solve(f.read().strip(), 5)
-    #     print(result)
+    with open(f'{script}-dev.txt') as f:
+        result = s.solve(f.read().strip().split(','), 5)
+        print(result)
     #
     # with open(f'{script}.txt') as f:
     #     result = s.solve(f.read().strip(), 256)
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     #     result = s.solve(f.read().strip(), 5, True)
     #     print(result)
     #
-    with open(f'{script}.txt') as f:
-        result = s.solve(f.read().strip(), 256, True)
-        print(result)
+    # with open(f'{script}.txt') as f:
+    #     result = s.solve(f.read().strip(), 256, True)
+    #     print(result)
     #
