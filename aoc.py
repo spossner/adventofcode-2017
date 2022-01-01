@@ -11,10 +11,18 @@ SOUTH = Point(0, 1)
 WEST = Point(-1, 0)
 
 
-def translate(p: Union[Point, Point3d], offset: Union[Point, Point3d]) -> Union[Point, Point3d]:
+def translate(p: Union[Point, Point3d, tuple], offset: Union[Point, Point3d, tuple]) -> Union[Point, Point3d, tuple]:
     if type(p) == Point:
         return Point(p.x + offset.x, p.y + offset.y)
-    return Point3d(p.x + offset.x, p.y + offset.y, p.z + offset.z)
+    if type(p) == Point3d:
+        return Point3d(p.x + offset.x, p.y + offset.y, p.z + offset.z)
+    if type(p) == tuple:
+        assert len(p) == len(offset)
+        result = []
+        for i in range(len(p)):
+            result.append(p[i]+offset[i])
+        return tuple(result)
+    raise ValueError(f'can not translate {type(p)}')
 
 
 def rot_cw(p: Point) -> Point:
