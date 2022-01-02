@@ -7,6 +7,7 @@ from functools import total_ordering, reduce
 import bisect
 from itertools import permutations, zip_longest
 from time import sleep
+import pygame as pg
 
 import colorama
 from colorama.ansi import clear_screen
@@ -15,6 +16,11 @@ from aoc import fetch
 from hex import Hex
 import networkx as nx
 from colorama import Fore, Back, Style, Cursor
+
+SIZE = WIDTH, HEIGHT = 800, 600  # the width and height of our screen
+CENTER = (WIDTH >> 1, HEIGHT >> 1)
+BACKGROUND_COLOR = pg.Color('white')  # The background color of our window
+FPS = 60  # Frames per second
 
 RUNNING = 1
 WAITING = 2
@@ -98,14 +104,55 @@ class Solution:
         self.modified = modified
 
     def solve(self, n=1):
+        pg.init()
+        screen = pg.display.set_mode(SIZE)
+        font = pg.font.SysFont('OpenSans', 22)
+        clock = pg.time.Clock()
+
+
         threads = []
         for i in range(n):
-            threads.append(Thread(i, self.data))
+            t = Thread(i, self.data)
+            if self.modified:
+                t.set('a', 1)
+            threads.append(t)
 
         last_sound = None
         running = True
+        paused = False
+        step = 0
         count = 0
         while running:
+            for e in pg.event.get():
+                if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
+                    pg.quit()
+                    sys.exit()
+                elif e.type == pg.KEYDOWN:
+                    if e.key == pg.K_SPACE:
+                        paused = not paused
+                    elif e.key == pg.K_RIGHT:
+                        step = 1
+
+            clock.tick(FPS)
+            screen.fill(BACKGROUND_COLOR)
+
+            t = threads[0]
+            for i, cmd in enumerate(t.data):
+                text = font.render(f"{i:<2}: {cmd}", True, pg.Color('black'),  pg.Color('red') if t.ptr == i else BACKGROUND_COLOR)
+                screen.blit(text, (20, 10+i*(font.get_height()+3)))
+
+            for i, k in enumerate('abcdefgh'):
+                text = font.render(f"{k}: {t.get(k)}", True, pg.Color('black'))
+                screen.blit(text, (200, 10 + i * (font.get_height() + 3)))
+
+            pg.display.flip()
+
+            if step > 0:
+                step -= 1
+                paused = True
+            elif paused:
+                continue
+
             running = False
             for thread in threads:
                 if thread.is_finished() or thread.is_blocked():
@@ -113,9 +160,6 @@ class Solution:
                 running = True  # at least one thread is running
                 ops = thread.next()  # self.data[thread.ptr]
                 cmd, a1, a2 = fetch(ops, 3)
-                print(f"{pos(1, MINY + thread.ptr)}{Back.YELLOW} {thread.ptr:>2} {cmd} {a1} {a2}", end='')
-                # sleep(0.2)
-                print(f"{pos(1, MINY + thread.ptr)}{Back.WHITE} {thread.ptr:>2} {cmd} {a1} {a1}", end='')
                 # print(ops, a1, a2)
                 if cmd == 'snd':
                     last_sound = thread.get(a1)
@@ -155,7 +199,7 @@ class Solution:
                         continue
                 thread.increase_ptr()
 
-        print(Back.WHITE)
+        #print(Back.WHITE)
         print(count)
         return threads
 
@@ -166,13 +210,36 @@ if __name__ == '__main__':
         script = script.split('-')[0]
 
     DEV = False
-    PART2 = False
+    PART2 = True
     SPLIT_LINES = True
     SPLIT_CHAR = ' '
 
-    colorama.init()
-    clear_screen()
+    # colorama.init()
+    # clear_screen()
 
-    with open(f'{script}{"-dev" if DEV else ""}.txt') as f:
-        s = Solution(f.read().strip(), PART2, SPLIT_LINES, SPLIT_CHAR)
-        print(s.solve())
+    # with open(f'{script}{"-dev" if DEV else ""}.txt') as f:
+    #     s = Solution(f.read().strip(), PART2, SPLIT_LINES, SPLIT_CHAR)
+    #     print(s.solve())
+
+    # get no of non prime numbers from 107900 to 124900 (incl) with step width 17
+    # 107900, 107917, 107934,..., 124866, 124883, 124900 --> 907 times non prime
+
+    total = 0
+    a, b = 107900, 124900
+    for i in range(a, b + 1, 17):
+        flag = 1
+
+        for j in range(2, i // 2 + 1):
+            if i % j == 0:
+                flag = 0
+                break
+
+        # flag = 1 means i is prime
+        # and flag = 0 means i is not prime
+        if flag == 0:
+            total += 1
+            print(i, total)
+
+
+# 906 -> TOO LOW
+# 907 -> correct
