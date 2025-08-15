@@ -1,14 +1,10 @@
-import operator
+
 import os
 import sys
-from collections import deque, defaultdict, namedtuple
-from functools import total_ordering, reduce
-import bisect
-from itertools import permutations, zip_longest, count
+from collections import deque
+from itertools import  zip_longest, count
 
-from aoc import fetch, Point, translate, rot_ccw, rot_cw, SOUTH
-from hex import Hex
-import networkx as nx
+from aoc import  Point, translate, rot_ccw, rot_cw, SOUTH
 
 
 def grouper(iterable, n, fillvalue=None):

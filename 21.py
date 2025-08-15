@@ -1,14 +1,8 @@
 import math
-import operator
 import os
 import sys
-from collections import deque, defaultdict, namedtuple
-from functools import total_ordering, reduce
-import bisect
-from itertools import permutations, zip_longest, count
 
-from aoc import fetch, Point, translate, rot_ccw, rot_cw, SOUTH, Point3d, manhattan_distance
-import networkx as nx
+from aoc import  Point
 import pygame as pg
 import numpy as np
 

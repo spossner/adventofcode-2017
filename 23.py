@@ -1,21 +1,13 @@
-import operator
+
 import os
 import sys
-from collections import deque, defaultdict, namedtuple
+from collections import deque, defaultdict
 from copy import deepcopy
-from functools import total_ordering, reduce
-import bisect
-from itertools import permutations, zip_longest
-from time import sleep
+from itertools import  zip_longest
 import pygame as pg
 
-import colorama
-from colorama.ansi import clear_screen
-
 from aoc import fetch
-from hex import Hex
-import networkx as nx
-from colorama import Fore, Back, Style, Cursor
+from colorama import   Cursor
 
 SIZE = WIDTH, HEIGHT = 800, 600  # the width and height of our screen
 CENTER = (WIDTH >> 1, HEIGHT >> 1)

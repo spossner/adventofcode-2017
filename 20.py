@@ -1,14 +1,9 @@
-import operator
+
 import os
 import sys
-from collections import deque, defaultdict, namedtuple
-from functools import total_ordering, reduce
-import bisect
-from itertools import permutations, zip_longest, count
+from itertools import  zip_longest
 
-from aoc import fetch, Point, translate, rot_ccw, rot_cw, SOUTH, Point3d, manhattan_distance
-from hex import Hex
-import networkx as nx
+from aoc import  Point, translate,    Point3d, manhattan_distance
 import pygame as pg
 
 SIZE = WIDTH, HEIGHT = 800, 600  # the width and height of our screen

@@ -1,17 +1,11 @@
 import math
-import operator
 import os
 import sys
-from collections import deque, defaultdict, namedtuple
+from collections import deque, defaultdict
 from functools import total_ordering, reduce
-import bisect
-from itertools import permutations, zip_longest, count
 
-import networkx as nx
 import pygame as pg
 import numpy as np
-
-from aoc import Point, NORTH, rot_ccw, rot_cw, translate
 
 
 class Solution:
